@@ -14,7 +14,9 @@ use DDP;
 
 any '/*' => sub ($c) {
     my $req = $c->req;
-    my @parts = $req->url->path->parts->@*;
+    my $parts = $req->url->path;
+    my @parts = split '/', $parts;
+    shift @parts until $parts[0];
 
     my @deletion;
     my @insertion;
@@ -25,7 +27,7 @@ any '/*' => sub ($c) {
     while (@parts) {
         my $cmd = shift @parts;
         if ($cmd eq '_drop') {
-            my $param = shift @parts;
+            my $param = Mojo::Util::url_unescape shift @parts;
             if ($param eq '_all') {
                 $is_drop_all = 1;
             } else {
@@ -35,7 +37,7 @@ any '/*' => sub ($c) {
             $next_hop = join '/', @parts;
             last;
         } else {
-            my $param = shift @parts;
+            my $param = Mojo::Util::url_unescape shift @parts;
             push @insertion, [ $cmd, $param ];
         }
     }
@@ -55,7 +57,7 @@ any '/*' => sub ($c) {
         $req->body,
     );
 
-    $c->ua->start_p($onward_tx);
+    $c->proxy->start_p($onward_tx);
 };
 
 app->start;
