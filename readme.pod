@@ -1,0 +1,67 @@
+=encoding utf8
+
+=head1 NAME
+
+proxy.pl - 基于Mojolicious的异步HTTP代理服务器
+
+=head1 SYNOPSIS
+
+    # 启动开发服务器
+    perl proxy.pl daemon
+
+=head1 DESCRIPTION
+
+这个 Perl 脚本实现了一个灵活的 HTTP 代理服务器，可以通过 URL 路径参数动态修改 HTTP 请求头并转发到指定目标。
+
+=head1 USAGE
+
+=head2 基本语法
+
+    http://your-proxy/{commands}/{target-url}
+
+=head2 可用命令
+
+=over 4
+
+=item * 删除请求头
+
+    _drop/{header-name}    # 删除指定请求头
+    _drop/_all             # 删除所有请求头
+
+=item * 添加/修改请求头
+
+    {header-name}/{header-value}    # 添加或修改请求头
+
+=item * 指定目标URL（必须是最后一个参数）
+
+    _url/{full-target-url}    # 设置转发目标地址
+
+=back
+
+=head1 EXAMPLES
+
+=head2 删除指定请求头并转发
+
+    GET http://proxy/_drop/User-Agent/_url/https://api.example.com/data
+
+删除C<User-Agent>头后转发到C<https://api.example.com/data>
+
+=head2 添加新请求头
+
+    GET http://proxy/X-API-Key/secret123/_url/https://api.example.com/protected
+
+添加C<X-API-Key: secret123>头并转发
+
+=head2 组合操作
+
+    GET http://proxy/_drop/User-Agent/X-Custom-Header/MyValue/_url/https://target.site/endpoint
+
+删除C<User-Agent>头，添加C<X-Custom-Header>头，然后转发
+
+=head1 AUTHOR
+
+jyi
+
+=head1 LICENSE
+
+GPLv3
